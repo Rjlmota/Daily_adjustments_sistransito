@@ -3,6 +3,25 @@ import openpyxl
 from pathlib import Path
 from datetime import datetime
 import numpy as np
+import tkinter as tk
+from tkinter import filedialog
+
+root = tk.Tk()
+root.withdraw()
+
+def seletor():
+        while True:
+            arquivo = ''
+            input("Pressione enter para selecionar o arquivo")
+            arquivo = filedialog.askopenfilename()
+            print("Voce selecionou:" + arquivo)
+            print("Deseja confirmar? (y/n)")
+            print(">", end='')
+            resposta = input()
+            if resposta == 'y' or resposta == 'Y':
+                break
+        return arquivo
+
 
 #Declaração dos joins
 dias_semana = ['seg','ter','qua','qui','sex','sáb','dom'] #Utilizar com o datetime data.weekday() para extrair o indice da data
@@ -11,8 +30,14 @@ meses = {1:'janeiro',2:'fevereiro',3:'marco',4:'abril',5:'maio',6:'junho',7:'jul
 tipo_veiculo2 = {'MOTOCICLETA':'Motocicletas','MOTONETA':'Motocicletas','AUTOMOVEL':'Veículos Leves','CAMINHONETE':'Veículos Leves','UTILITARIO':'Veículos Leves','CAMINHAO':'Veículos Pesados','CAMINHAO TRATOR':'Veículos Pesados','CAMIONETA':'Veículos Leves','CICLOMOTOR':'Outros Veículos','MICROONIBUS':'Veículos Pesados','ONIBUS':'Veículos Pesados','PREJUDICADO':'Outros Veículos','REBOQUE':'Reboques','SEMI-REBOQUE':'Outros Veículos','SIDE-CAR':'Outros Veículos','TRICICLO':'Outros Veículos','VAN':'Veículos Leves','NAO IDENTIFICADO':'Não Identificado'}
 
 
+print("========SISTEMAS DE AJUSTES DE BASES DE VEÍCULOS========")
+arquivo = seletor()
+
+
+
+
 #Dataframe inicializado
-dt = pd.read_excel('teste.xlsx', header=0, engine='openpyxl') #OBS: ajustar o formato das datas e horas na hora da extração
+dt = pd.read_excel(arquivo, header=0, engine='openpyxl') #OBS: ajustar o formato das datas e horas na hora da extração
 dt['index'] = range(0, len(dt))
 dt['dia_fato_siac_rf'] = ''
 dt['mes_fato_siac_rf'] = ''
@@ -98,14 +123,8 @@ for iten in range(0,len(dt)): #Loop to add the column tipo_de_veiculo_siac_1_rf
 dt = dt.join(dt_veiculo_tipo, on='tipo_de_veiculo_siac_1_rf')
 dt['tipo_de_veiculo_siac_2_rf'] = dt['Tipo Veiculo']
 
+dtteste = dt[['SITUAÇÃO OCORRENCIA','UF BOP','N  BOP','DATA REGISTRO','HORA REGISTRO','DATA FATO','dia_fato_siac_rf','mes_fato_siac_rf','ano_fato_siac_rf','mes_registro_siac_rf','MÊS REGISTRO','MÊS FATO','ANO REGISTRO','ANO FATO','DIA DA SEMANA','HORA DO FATO','FAIXA DE HORA','faixa_hora_2','MOTIVO DETERMINANTE','LOCAL OCORRENCIA','local_sisp_prec_siac','local_ocorrencia_siac_rf','regiao_siac_rf','risp_siac_rf','aisp_siac_rf','bairros_siac_rf','distritos','BAIRRO OCORRENCIA','bairros_sisp_prec_siac','ENDERECO OCORRENCIA','MEIO EMPREGADO','PLACA VEICULO','UF VEICULO','CHASSI VEICULO','marca','modelo','COR','TIPO DE VEICULO','tipo_de_veiculo_siac_1_rf','tipo_de_veiculo_siac_2_rf','CATEGORIA','MUNICIPIO VEICULO','INFORMANTE','ANO FABRICAÇÃO','ANO MODELO','NOME PORTADOR']]
+print(dtteste)
+
 with pd.ExcelWriter('resultado_teste.xlsx',engine='xlsxwriter', datetime_format='dd/mm/yyyy',date_format='dd/mm/yyyy') as writer:
-            dt.to_excel(writer,index=False)
-
-
-
-
-
-
-
-
-
+    dtteste.to_excel(writer,index=False)
